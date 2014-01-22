@@ -1,6 +1,6 @@
 {
   "name": "fcmp",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "easy way to compare the content of two files",
   "scripts": {
     "test": "mocha"
