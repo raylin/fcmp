@@ -21,7 +21,7 @@ describe('fcmp', function () {
         it('should checksum return hash', function () {
             fcmp.checksumSync(dmyOne).should.be.ok
                 .and.be.type('string')
-                .and.equal('d50679bd9ce0a8371c8b4be6390a6c8d9c59780e');
+                .and.have.length(40);
         }); 
         
         it('should compare not exists file return false', function () {
@@ -52,7 +52,7 @@ describe('fcmp', function () {
                 (err === null).should.be.true;
                 checksum.should.be.ok
                     .and.be.type('string')
-                    .and.equal('d50679bd9ce0a8371c8b4be6390a6c8d9c59780e');
+                    .and.have.length(40);
 
                 done();
             });

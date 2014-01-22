@@ -1,7 +1,7 @@
 {
   "name": "fcmp",
-  "version": "0.0.1",
-  "description": "Async or Sync comparse two files",
+  "version": "0.0.3",
+  "description": "easy way to compare the content of two files",
   "scripts": {
     "test": "mocha"
   },
@@ -12,7 +12,7 @@
   },
   "keywords": [
     "file",
-    "comparsion",
+    "compare",
     "hash",
     "checksum"
   ],

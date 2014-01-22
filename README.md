@@ -12,7 +12,6 @@ require fcmp:
 
 ```
 var fcmp = require('fcmp');
-
 ```
 
 ### setAlgo
