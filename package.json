@@ -1,0 +1,32 @@
+{
+  "name": "fcmp",
+  "version": "0.0.1",
+  "description": "Async or Sync comparse two files",
+  "scripts": {
+    "test": "mocha"
+  },
+  "main": "fcmp.js",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:raylin/fcmp.git"
+  },
+  "keywords": [
+    "file",
+    "comparsion",
+    "hash",
+    "checksum"
+  ],
+  "engines": {
+    "node": "0.10.x"
+  },
+  "author": "Ray Lin <lieeray4136@gmailc.om>",
+  "license": "MIT",
+  "devDependencies": {
+    "should": "~3.0.1",
+    "mocha": "~1.17.0"
+  },
+  "dependencies": {
+    "lodash": "~2.4.1",
+    "async": "~0.2.9"
+  }
+}

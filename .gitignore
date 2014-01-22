@@ -1,0 +1,7 @@
+.DS_Store
+.idea/
+.build/
+node_modules/
+*.iml
+out
+test/config.json
