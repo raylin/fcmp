@@ -41,7 +41,7 @@ describe('fcmp', function () {
         it('should checksum not exists file get error', function (done) {
             fcmp.checksum('./path/not/exists', function (err, checksum) {
                 err.should.be.instanceof(Error);
-                (checksum === null).should.be.true;
+                (checksum === undefined).should.be.true;
 
                 done();
             });

@@ -8,8 +8,29 @@ var crypto = require('crypto'),
 var fcmp = exports;
 
 
-function _validFile(file) {
+function _validFileSync(file) {
     return (typeof file === 'string' && fs.existsSync(file) && fs.statSync(file).isFile());
+}
+
+function _validFile(file, callback) {
+    async.series([
+
+        function (callback) {
+            callback(typeof file !== 'string' || file.trim() === '');
+        },
+        function (callback) {
+            fs.exists(file, function (exists) {
+                callback(!exists);
+            });
+        },
+        function (callback) {
+            fs.stat(file, function (err, stats) {
+                callback(err || !stats.isFile());
+            });
+        }
+    ], function (err) {
+        callback(err ? new Error('invalid file or callback') : null);
+    });
 }
 
 
@@ -19,11 +40,11 @@ fcmp.setAlgo = function (algo) {
     if (algo && _.indexOf(crypto.getHashes(), algo) !== -1) {
         fcmp.algo = algo;
     }
-    return fcmp.algo === algo;
+    return this.algo === algo;
 };
 
 fcmp.checksumSync = function (file) {
-    if (!_validFile(file)) return null;
+    if (!_validFileSync(file)) return null;
 
     var hasher = crypto.createHash(this.algo);
 
@@ -31,24 +52,31 @@ fcmp.checksumSync = function (file) {
 };
 
 fcmp.checksum = function (file, callback) {
-    if (!_validFile(file)) {
-        callback(new Error('invalid file'), null);
-        return;
-    }
-
     async.waterfall([
 
-        function readFile(callback) {
-            fs.readFile(file, function (err, data) {
-                callback(err, data);
+        function (callback) {
+            _validFile(file, function (err) {
+                callback(err);
             });
-        }, (function checksum(data, callback) {
-            var hasher = crypto.createHash(this.algo);
+        }, 
+        (function (callback) {
 
-            callback(null, hasher.update(data).digest('hex'));
+            var hasher = crypto.createHash(this.algo),
+                fReadStream = fs.createReadStream(file);
+
+            hasher.setEncoding('hex');
+            fReadStream.on('end', function () {
+                hasher.end();
+                callback(null, hasher.read());
+            }).
+            on('error', function (err) {
+                callback(err);
+            });
+
+            fReadStream.pipe(hasher);
         }).bind(fcmp)
-    ], function (err, hash) {
-        callback(err, hash);
+    ], function (err, checksum) {
+        callback(err, checksum);
     });
 };
 
@@ -57,7 +85,9 @@ fcmp.compareSync = function (fileOne, fileTwo) {
 };
 
 fcmp.compare = function (fileOne, fileTwo, callback) {
-    async.map([fileOne, fileTwo], this.checksum, function (err, results) {
-        callback(err, results[0] === results[1]);
+    async.map([fileOne, fileTwo], (this.checksum).bind(fcmp), function (err, results) {
+        if (typeof callback === 'function') {
+            callback(err, (typeof results[0] === 'string' && results[0] === results[1]));
+        }
     });
 };

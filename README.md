@@ -1,3 +1,12 @@
+## Changes
+
+### 0.0.5 / 2014/01/23
+
+* add support for massive file comparsion (async version)
+* improve async performance
+* prevent callback undefined
+
+
 ## Getting started
 
 ### install

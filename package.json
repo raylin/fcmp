@@ -1,7 +1,7 @@
 {
   "name": "fcmp",
-  "version": "0.0.4",
-  "description": "easy way to compare the content of two files",
+  "version": "0.0.5",
+  "description": "easy way to get checksum or compare the content of two files",
   "scripts": {
     "test": "mocha"
   },
@@ -14,7 +14,9 @@
     "file",
     "compare",
     "hash",
-    "checksum"
+    "checksum",
+    "sha1",
+    "file compare"
   ],
   "engines": {
     "node": "0.10.x"
