@@ -1,5 +1,14 @@
 ## History
 
+### 0.1.0 / 2014/01/24
+
+* remove file validation, handle the exceptions yourself
+    + checksumSync() and compareSync(): throw exception when file not exists
+    + checksum() and compare(): get err in callback function 
+
+* remove dependency: lodash
+
+
 ### 0.0.8 / 2014/01/23
 
 * quick fix for missing callback check

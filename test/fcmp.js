@@ -4,7 +4,9 @@ var fcmp = require('../fcmp');
 
 var dmyOne = './test/data/dmy1',
     dmyTwo = './test/data/dmy2',
-    dmyThree = './test/data/dmy3'; // same as dmyOne
+    dmyThree = './test/data/dmy3', // same as dmyOne
+    dmyNotExists = './this/file/doesnt/exists';
+
 
 describe('fcmp', function () {
     it('should be able to change algo', function () {
@@ -13,41 +15,27 @@ describe('fcmp', function () {
         fcmp.setAlgo('sha1').should.be.true;
     });
 
-    describe('#sync', function () {
-        it('should checksum not exists file return null', function () {
-            (fcmp.checksumSync('./path/not/exists') === null).should.be.true;
+    describe('#checksumSync()', function () {
+        it('should throw expection when file not exists', function () {
+            (function () {
+                fcmp.checksumSync(dmyNotExists);
+            }).should.throwError();
         });
-
-        it('should checksum return hash', function () {
+        it('should return checksum', function () {
             fcmp.checksumSync(dmyOne).should.be.ok
                 .and.be.type('string')
                 .and.have.length(40);
-        }); 
-        
-        it('should compare not exists file return false', function () {
-            fcmp.compareSync(dmyOne, './file/not/exists').should.be.false;
-        });
-
-        it('should compare different files return false', function () {
-            fcmp.compareSync(dmyOne, dmyTwo).should.be.false;     
-        });
-
-        it('should compare same files return true', function () {
-            fcmp.compareSync(dmyOne, dmyThree).should.be.true;
         });
     });
 
-    describe('#async', function () {
-        it('should checksum not exists file get error', function (done) {
-            fcmp.checksum('./path/not/exists', function (err, checksum) {
+    describe('#checksum()', function () {
+        it('should error when file not exists', function (done) {
+            fcmp.checksum(dmyNotExists, function (err) {
                 err.should.be.instanceof(Error);
-                (checksum === undefined).should.be.true;
-
                 done();
             });
         });
-
-        it('should checksum return hash', function (done) {
+        it('should return checksum', function (done) {
             fcmp.checksum(dmyOne, function (err, checksum) {
                 (err === null).should.be.true;
                 checksum.should.be.ok
@@ -56,33 +44,46 @@ describe('fcmp', function () {
 
                 done();
             });
-        }); 
+        });
+    });
 
-        it('should compare not exists file get error and return false', function (done) {
-            fcmp.compare(dmyOne, './file/not/exists', function (err, comparsion) {
+    describe('#compareSync()', function () {
+        it('should throw exception when one of the file not exists', function () {
+            (function () {
+                var result = fcmp.compareSync(dmyOne, dmyNotExists);
+            }).should.
+            throw ();
+        });
+        it('should return false when files are different', function () {
+            fcmp.compareSync(dmyOne, dmyTwo).should.be.false;
+        });
+        it('should return true when files are same', function () {
+            fcmp.compareSync(dmyOne, dmyThree).should.be.true;
+        });
+    });
+
+    describe('#compare()', function () {
+        it('should throw exception when one of the file not exists', function (done) {
+            fcmp.compare(dmyOne, dmyNotExists, function (err) {
                 err.should.be.instanceof(Error);
-                (comparsion === null).should.be.false;
+                done();
+            });
+        });
+        it('should return false when files are different', function (done) {
+            fcmp.compare(dmyOne, dmyTwo, function (err, result) {
+                (err === null).should.be.true;
+                result.should.be.false;
 
                 done();
             });
         });
-
-        it('should compare different files return false', function (done) {
-            fcmp.compare(dmyOne, dmyTwo, function (err, comparsion) {
+        it('should return true when files are same', function (done) {
+            fcmp.compare(dmyOne, dmyThree, function (err, result) {
                 (err === null).should.be.true;
-                comparsion.should.be.false;
+                result.should.be.true;
 
                 done();
             });
-        });
-
-        it('should compare same files return true', function (done) {
-            fcmp.compare(dmyOne, dmyThree, function (err, comparsion) {
-                (err === null).should.be.true;
-                comparsion.should.be.true;
-
-                done();
-            }); 
         });
     });
 });
