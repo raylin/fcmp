@@ -1,6 +1,6 @@
 {
   "name": "fcmp",
-  "version": "0.0.6",
+  "version": "0.0.8",
   "description": "easy way to get checksum or compare the content of two files",
   "scripts": {
     "test": "mocha"

@@ -1,6 +1,6 @@
 ## History
 
-### 0.0.6 / 2014/01/23
+### 0.0.8 / 2014/01/23
 
 * quick fix for missing callback check
 
@@ -29,10 +29,10 @@ var fcmp = require('fcmp');
 
 ### setAlgo
 
-The algo must be one of crypto.getHashes(). The default algo is `sha1`, if you want to change the algo, this function must call before the others.
+The algorithm must be one of crypto.getHashes(). The default algorithm is `sha1`, if you want to change the algorithm, this function should call before the others.
 
 ```
-// Default algo: sha1
+// Default algorithm: sha1
 fcmp.setAlgo('md5');
 ```
 
@@ -45,7 +45,7 @@ fcmp.checksum('path/to/file', function (err, checksum) {
 });
 ```
 
-### checksum (sync version)
+### checksumSync
 
 ```
 var checksum = fcmp.checksumSync('path/to/file');
@@ -56,11 +56,11 @@ var checksum = fcmp.checksumSync('path/to/file');
 
 ```
 fcmp.compare('file/path/one', 'file/path/two', function (err, result) {
-    // result true means the content of two files are same.
+    // result: true - means the content of two files are same.
 });
 ```
 
-### compare (sync version)
+### compareSync
 
 ```
 var result = fcmp.compareSync('file/path/one', 'file/path/two');

@@ -9,7 +9,7 @@ var fcmp = exports;
 
 
 function _validFileSync(file) {
-    return (typeof file === 'string' && fs.existsSync(file) && fs.statSync(file).isFile());
+    return (typeof file === 'string' && file.trim() !== '' && fs.existsSync(file) && fs.statSync(file).isFile());
 }
 
 function _validFile(file, callback) {
@@ -87,9 +87,9 @@ fcmp.compareSync = function (fileOne, fileTwo) {
 };
 
 fcmp.compare = function (fileOne, fileTwo, callback) {
+    if (typeof callback !== 'function') return;
+
     async.map([fileOne, fileTwo], (this.checksum).bind(fcmp), function (err, results) {
-        if (typeof callback === 'function') {
-            callback(err, (typeof results[0] === 'string' && results[0] === results[1]));
-        }
+        callback(err, (typeof results[0] === 'string' && results[0] === results[1]));
     });
 };
