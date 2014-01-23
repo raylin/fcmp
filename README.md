@@ -1,4 +1,8 @@
-## Changes
+## History
+
+### 0.0.6 / 2014/01/23
+
+* quick fix for missing callback check
 
 ### 0.0.5 / 2014/01/23
 

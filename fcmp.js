@@ -29,7 +29,7 @@ function _validFile(file, callback) {
             });
         }
     ], function (err) {
-        callback(err ? new Error('invalid file or callback') : null);
+        callback(err ? new Error('invalid file') : null);
     });
 }
 
@@ -52,6 +52,8 @@ fcmp.checksumSync = function (file) {
 };
 
 fcmp.checksum = function (file, callback) {
+    if (typeof callback !== 'function') return;
+
     async.waterfall([
 
         function (callback) {
