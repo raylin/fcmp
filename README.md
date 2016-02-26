@@ -1,7 +1,12 @@
 ## History
 
-### 0.1.0 / 2014/01/24
+### 0.2.0 / 2016/02/26
+* remove checksum function and focuse on files comparsion
+* change callback-style to promise
+* support multi arguments
+* rewrite in ES6
 
+### 0.1.0 / 2014/01/24
 * remove file validation, handle the exceptions yourself
     + checksumSync() and compareSync(): throw exception when file not exists
     + checksum() and compare(): get err in callback function 
@@ -10,11 +15,9 @@
 
 
 ### 0.0.8 / 2014/01/23
-
 * quick fix for missing callback check
 
 ### 0.0.5 / 2014/01/23
-
 * add support for massive file comparsion (async version)
 * improve async performance
 * prevent callback undefined
@@ -34,45 +37,6 @@ require fcmp:
 
 ```
 var fcmp = require('fcmp');
-```
-
-### setAlgo
-
-The algorithm must be one of crypto.getHashes(). The default algorithm is `sha1`, if you want to change the algorithm, this function should call before the others.
-
-```
-// Default algorithm: sha1
-fcmp.setAlgo('md5');
-```
-
-### checksum 
-
-
-```
-fcmp.checksum('path/to/file', function (err, checksum) {
-    // return the checksum of file
-});
-```
-
-### checksumSync
-
-```
-var checksum = fcmp.checksumSync('path/to/file');
-
-```
-
-### compare
-
-```
-fcmp.compare('file/path/one', 'file/path/two', function (err, result) {
-    // result: true - means the content of two files are same.
-});
-```
-
-### compareSync
-
-```
-var result = fcmp.compareSync('file/path/one', 'file/path/two');
 ```
 
 ## Test

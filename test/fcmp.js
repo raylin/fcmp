@@ -1,89 +1,98 @@
 'use strict';
 
-var fcmp = require('../fcmp');
+import {createReadStream} from 'fs';
+import chai from 'chai';
+import chaiAsPromised from 'chai-as-promised';
 
-var dmyOne = './test/data/dmy1',
-    dmyTwo = './test/data/dmy2',
-    dmyThree = './test/data/dmy3', // same as dmyOne
-    dmyNotExists = './this/file/doesnt/exists';
+import fcmp from '../dist/fcmp';
 
+chai.should();
+chai.use(chaiAsPromised);
 
-describe('fcmp', function () {
-    it('should be able to change algo', function () {
-        fcmp.setAlgo('md5').should.be.true;
-        fcmp.setAlgo('fake algo').should.be.false;
-        fcmp.setAlgo('sha1').should.be.true;
-    });
+const MOCK_FILES = Object.freeze(
+  new Map()
+  .set('1', {
+    file: './test/mock_files/1',
+    sha1: '56e21aeb132bff61ec0b39dab24d7ae446e3046a'
+  })
+  .set('2', {
+    file: './test/mock_files/1_copy1',
+    sha1: '56e21aeb132bff61ec0b39dab24d7ae446e3046a'
+  })
+  .set('3', {
+    file: './test/mock_files/1_copy2',
+    sha1: '56e21aeb132bff61ec0b39dab24d7ae446e3046a'
+  })
+  .set('4', {
+    file: './test/mock_files/2',
+    sha1: 'da1610c86cf0fb3f89cdea3c83bfe15f2fd2e3f6'
+  })
+  .set('5', {
+    file: './test/mock_files/3',
+    sha1: '9fb00d06a8fbe298827a3ca7cbbb7e021e1b6204'
+  })
+  .set('6', {
+    file: './test/mock_files/3_copy1',
+    sha1: '9fb00d06a8fbe298827a3ca7cbbb7e021e1b6204'
+  })
+);
 
-    describe('#checksumSync()', function () {
-        it('should throw expection when file not exists', function () {
-            (function () {
-                fcmp.checksumSync(dmyNotExists);
-            }).should.throwError();
-        });
-        it('should return checksum', function () {
-            fcmp.checksumSync(dmyOne).should.be.ok
-                .and.be.type('string')
-                .and.have.length(40);
-        });
-    });
+describe('fcmp', () => {
+  it('should fail with wrong type arguments', done => {
+    let wrontArg = 1234;
 
-    describe('#checksum()', function () {
-        it('should error when file not exists', function (done) {
-            fcmp.checksum(dmyNotExists, function (err) {
-                err.should.be.instanceof(Error);
-                done();
-            });
-        });
-        it('should return checksum', function (done) {
-            fcmp.checksum(dmyOne, function (err, checksum) {
-                (err === null).should.be.true;
-                checksum.should.be.ok
-                    .and.be.type('string')
-                    .and.have.length(40);
+    fcmp(wrontArg).should.be.rejected.and.notify(done);
+  });
 
-                done();
-            });
-        });
-    });
+  it('should fail with a non-existent file', done => {
+    let nonExistentFile = '/A/NON/EXISTENT/FILE';
 
-    describe('#compareSync()', function () {
-        it('should throw exception when one of the file not exists', function () {
-            (function () {
-                var result = fcmp.compareSync(dmyOne, dmyNotExists);
-            }).should.
-            throw ();
-        });
-        it('should return false when files are different', function () {
-            fcmp.compareSync(dmyOne, dmyTwo).should.be.false;
-        });
-        it('should return true when files are same', function () {
-            fcmp.compareSync(dmyOne, dmyThree).should.be.true;
-        });
-    });
+    fcmp(
+      nonExistentFile,
+      MOCK_FILES.get('1').file,
+      MOCK_FILES.get('4').file
+    ).should.be.rejected.and.notify(done);
+  });
 
-    describe('#compare()', function () {
-        it('should throw exception when one of the file not exists', function (done) {
-            fcmp.compare(dmyOne, dmyNotExists, function (err) {
-                err.should.be.instanceof(Error);
-                done();
-            });
-        });
-        it('should return false when files are different', function (done) {
-            fcmp.compare(dmyOne, dmyTwo, function (err, result) {
-                (err === null).should.be.true;
-                result.should.be.false;
+  it('should be the same - glob', done => {
+    fcmp('./test/mock_files/1*').should.eventually.equal(true).and.notify(done);
+  });
 
-                done();
-            });
-        });
-        it('should return true when files are same', function (done) {
-            fcmp.compare(dmyOne, dmyThree, function (err, result) {
-                (err === null).should.be.true;
-                result.should.be.true;
+  it('should be the same - multi globs', done => {
+    fcmp(
+      MOCK_FILES.get('1').file,
+      MOCK_FILES.get('2').file,
+      MOCK_FILES.get('3').file
+    ).should.eventually.equal(true).and.notify(done);
+  });
 
-                done();
-            });
-        });
-    });
+  it('should be the same - glob + stream', done => {
+    fcmp(
+      MOCK_FILES.get('1').file,
+      MOCK_FILES.get('3').file,
+      createReadStream(MOCK_FILES.get('1').file),
+      createReadStream(MOCK_FILES.get('2').file)
+    ).should.eventually.equal(true).and.notify(done);
+  });
+
+  it('should not be the same - glob', done => {
+    fcmp('./test/mock_files/*').should.eventually.equal(false).and.notify(done);
+  });
+
+  it('should not be the same - multi globs', done => {
+    fcmp(
+      MOCK_FILES.get('1').file,
+      MOCK_FILES.get('2').file,
+      MOCK_FILES.get('5').file
+    ).should.eventually.equal(false).and.notify(done);
+  });
+
+  it('should not be the same - glob + stream', done => {
+    fcmp(
+      MOCK_FILES.get('1').file,
+      MOCK_FILES.get('6').file,
+      createReadStream(MOCK_FILES.get('1').file),
+      createReadStream(MOCK_FILES.get('3').file)
+    ).should.eventually.equal(false).and.notify(done);
+  });
 });

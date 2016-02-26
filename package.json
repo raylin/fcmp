@@ -1,9 +1,12 @@
 {
   "name": "fcmp",
-  "version": "0.1.0",
-  "description": "easy way to get checksum or compare the content of two files",
+  "version": "0.2.0",
+  "description": "very easy way to compare the content of globs or read streams",
   "scripts": {
-    "test": "mocha"
+    "test": "npm run compile && mocha --compilers js:babel-register --reporter spec",
+    "lint": "eslint src test",
+    "compile": "babel src --out-dir dist --source-maps",
+    "build": "npm run lint && npm test && npm run compile"
   },
   "main": "fcmp.js",
   "repository": {
@@ -19,15 +22,24 @@
     "file compare"
   ],
   "engines": {
-    "node": "0.10.x"
+    "node": "4.3.2"
   },
-  "author": "Ray Lin <lieeray4136@gmailc.om>",
+  "author": "Ray Lin <lieeray4136@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "should": "~3.0.1",
-    "mocha": "~1.17.0"
+    "babel-preset-es2015": "^6.5.0",
+    "babel-register": "^6.5.2",
+    "chai": "^3.5.0",
+    "chai-as-promised": "^5.2.0",
+    "eslint": "^2.2.0",
+    "eslint-config-google": "^0.4.0",
+    "eslint-config-xo": "^0.11.0",
+    "karma": "^0.13.15",
+    "mocha": "^2.3.4",
+    "uglify-loader": "^1.3.0",
+    "webpack": "^1.12.9"
   },
   "dependencies": {
-    "async": "~0.2.9"
+    "glob": "^7.0.0"
   }
 }
