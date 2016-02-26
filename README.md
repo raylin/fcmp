@@ -1,3 +1,7 @@
+# fcmp
+[![Build Status](https://travis-ci.org/raylin/fcmp.png)](https://travis-ci.org/raylin/fcmp) [![Dependency Status](https://david-dm.org/raylin/fcmp/dev-status.svg)](https://david-dm.org/raylin/fcmp)
+
+
 ## History
 
 ### 0.2.0 / 2016/02/26
