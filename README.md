@@ -4,9 +4,14 @@
 
 ## History
 
+### 1.0.0 / 2016/03/03
+* change to new API
+* can handle variable argument
+* take glob string or Stream as input
+
 ### 0.2.0 / 2016/02/26
 * remove checksum function and focuse on files comparsion
-* change callback-style to promise
+* change from callback-style to promise
 * support multi arguments
 * rewrite in ES6
 
@@ -37,10 +42,28 @@ npm install fcmp
 
 ## Usage
 
-require fcmp:
-
+#### require fcmp:
 ```
 var fcmp = require('fcmp');
+```
+
+#### isSame:
+```
+fcmp('/test/file/**/*.png', '/test/file2/a.png', pngReadStream)
+.then(function(isSame) {...})
+// result is Boolean shows whether these files have the same content.
+```
+
+#### getChecksum:
+```
+fcmp('/test/file/**/*.png', './test/file/*.jpg').then(function(checksums) {...})
+// result gives a object with filename and hash pairs.
+```
+
+#### getDuplicate:
+```
+fcmp('/test/file/**/*.png').then(function(duplicateFiles) {...})
+// result is nested arrays, which put same content files into an array.
 ```
 
 ## Test

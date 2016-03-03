@@ -67,14 +67,22 @@ describe('fcmp', () => {
       fcmp(wrontArg).isSame().should.be.rejected.and.notify(done);
     });
 
-    it('should fail with a non-existent file', done => {
+    it('should fail when no file resolved', done => {
+      let nonExistentFile = '/A/NON/EXISTENT/FILE';
+
+      fcmp(
+        nonExistentFile
+      ).isSame().should.be.rejected.and.notify(done);
+    });
+
+    it('should pass if part of source could not resolved', done => {
       let nonExistentFile = '/A/NON/EXISTENT/FILE';
 
       fcmp(
         nonExistentFile,
         MOCK_FILES.get('1').file,
         MOCK_FILES.get('4').file
-      ).isSame().should.be.rejected.and.notify(done);
+      ).isSame().should.be.fulfilled.and.notify(done);
     });
 
     it('should be the same - glob', done => {

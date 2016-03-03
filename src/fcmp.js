@@ -52,7 +52,7 @@ function _src2Stream(src) {
 
   if (typeof src === 'string') {
     glob(src, {nodir: true}, (err, files) => {
-      if (err || !files.length) {
+      if (err) {
         def.reject(err);
       }
       def.resolve(files.map(f => {
