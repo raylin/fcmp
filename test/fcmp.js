@@ -1,7 +1,7 @@
 'use strict';
 
 import {createReadStream} from 'fs';
-import chai from 'chai';
+import chai, {expect} from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 
 import fcmp from '../dist/fcmp';
@@ -38,61 +38,137 @@ const MOCK_FILES = Object.freeze(
 );
 
 describe('fcmp', () => {
-  it('should fail with wrong type arguments', done => {
-    let wrontArg = 1234;
+  describe('#options', () => {
+    it('should get sha1 as default algorithm', () => {
+      expect(fcmp.options.algorithm).to.be.equal('sha1');
+    });
 
-    fcmp(wrontArg).should.be.rejected.and.notify(done);
+    it('should be able to change algorithm', () => {
+      let newAlgo = 'md5';
+      fcmp.options.algorithm = newAlgo;
+
+      expect(fcmp.options.algorithm).to.be.equal(newAlgo);
+    });
+
+    it('should not change to unsupport algorithm', () => {
+      let orgAlgo = fcmp.options.algorithm;
+      let newAlgo = 'algoUnsupported';
+      fcmp.options.algorithm = newAlgo;
+
+      expect(fcmp.options.algorithm).not.to.be.equal(newAlgo);
+      expect(fcmp.options.algorithm).to.be.equal(orgAlgo);
+    });
   });
 
-  it('should fail with a non-existent file', done => {
-    let nonExistentFile = '/A/NON/EXISTENT/FILE';
+  describe('#isSame', () => {
+    it('should fail with wrong type arguments', done => {
+      let wrontArg = 1234;
 
-    fcmp(
-      nonExistentFile,
-      MOCK_FILES.get('1').file,
-      MOCK_FILES.get('4').file
-    ).should.be.rejected.and.notify(done);
+      fcmp(wrontArg).isSame().should.be.rejected.and.notify(done);
+    });
+
+    it('should fail with a non-existent file', done => {
+      let nonExistentFile = '/A/NON/EXISTENT/FILE';
+
+      fcmp(
+        nonExistentFile,
+        MOCK_FILES.get('1').file,
+        MOCK_FILES.get('4').file
+      ).isSame().should.be.rejected.and.notify(done);
+    });
+
+    it('should be the same - glob', done => {
+      fcmp('./test/mock_files/1*').isSame()
+      .should.eventually.equal(true).and.notify(done);
+    });
+
+    it('should be the same - multi globs', done => {
+      fcmp(
+        MOCK_FILES.get('1').file,
+        MOCK_FILES.get('2').file,
+        MOCK_FILES.get('3').file
+      ).isSame().should.eventually.equal(true).and.notify(done);
+    });
+
+    it('should be the same - glob + stream', done => {
+      fcmp(
+        MOCK_FILES.get('1').file,
+        MOCK_FILES.get('3').file,
+        createReadStream(MOCK_FILES.get('1').file),
+        createReadStream(MOCK_FILES.get('2').file)
+      ).isSame().should.eventually.equal(true).and.notify(done);
+    });
+
+    it('should not be the same - glob', done => {
+      fcmp('./test/mock_files/*').isSame()
+      .should.eventually.equal(false).and.notify(done);
+    });
+
+    it('should not be the same - multi globs', done => {
+      fcmp(
+        MOCK_FILES.get('1').file,
+        MOCK_FILES.get('2').file,
+        MOCK_FILES.get('5').file
+      ).isSame().should.eventually.equal(false).and.notify(done);
+    });
+
+    it('should not be the same - glob + stream', done => {
+      fcmp(
+        MOCK_FILES.get('1').file,
+        MOCK_FILES.get('6').file,
+        createReadStream(MOCK_FILES.get('1').file),
+        createReadStream(MOCK_FILES.get('3').file)
+      ).isSame().should.eventually.equal(false).and.notify(done);
+    });
   });
 
-  it('should be the same - glob', done => {
-    fcmp('./test/mock_files/1*').should.eventually.equal(true).and.notify(done);
+  describe('#getChecksums', () => {
+    before(() => {
+      fcmp.options.algorithm = 'sha1';
+    });
+
+    it('shoud return correct sha1 hash', done => {
+      fcmp(
+        MOCK_FILES.get('1').file,
+        MOCK_FILES.get('2').file,
+        MOCK_FILES.get('5').file,
+        createReadStream(MOCK_FILES.get('2').file)
+      ).getChecksum().should.be.fulfilled.then(chks => {
+        let expectedResult = {
+          [MOCK_FILES.get('1').file]: MOCK_FILES.get('1').sha1,
+          [MOCK_FILES.get('2').file]: MOCK_FILES.get('2').sha1,
+          [MOCK_FILES.get('5').file]: MOCK_FILES.get('5').sha1
+        };
+
+        chks.should.eql(expectedResult);
+      }).should.notify(done);
+    });
   });
 
-  it('should be the same - multi globs', done => {
-    fcmp(
-      MOCK_FILES.get('1').file,
-      MOCK_FILES.get('2').file,
-      MOCK_FILES.get('3').file
-    ).should.eventually.equal(true).and.notify(done);
-  });
+  describe('#getDuplicate', () => {
+    before(() => {
+      fcmp.options.algorithm = 'sha1';
+    });
 
-  it('should be the same - glob + stream', done => {
-    fcmp(
-      MOCK_FILES.get('1').file,
-      MOCK_FILES.get('3').file,
-      createReadStream(MOCK_FILES.get('1').file),
-      createReadStream(MOCK_FILES.get('2').file)
-    ).should.eventually.equal(true).and.notify(done);
-  });
+    it('shoud return empty object', done => {
+      fcmp(
+        MOCK_FILES.get('1').file,
+        MOCK_FILES.get('4').file,
+        createReadStream(MOCK_FILES.get('5').file)
+      ).getDuplicate().should.be.fulfilled.then(dup => {
+        Object.keys(dup).length.should.be.empty;
+      }).should.notify(done);
+    });
 
-  it('should not be the same - glob', done => {
-    fcmp('./test/mock_files/*').should.eventually.equal(false).and.notify(done);
-  });
-
-  it('should not be the same - multi globs', done => {
-    fcmp(
-      MOCK_FILES.get('1').file,
-      MOCK_FILES.get('2').file,
-      MOCK_FILES.get('5').file
-    ).should.eventually.equal(false).and.notify(done);
-  });
-
-  it('should not be the same - glob + stream', done => {
-    fcmp(
-      MOCK_FILES.get('1').file,
-      MOCK_FILES.get('6').file,
-      createReadStream(MOCK_FILES.get('1').file),
-      createReadStream(MOCK_FILES.get('3').file)
-    ).should.eventually.equal(false).and.notify(done);
+    it('shoud got two duplicate sets', done => {
+      fcmp(
+        MOCK_FILES.get('1').file,
+        MOCK_FILES.get('2').file,
+        MOCK_FILES.get('5').file,
+        createReadStream(MOCK_FILES.get('2').file)
+      ).getDuplicate().should.be.fulfilled.then(dup => {
+        dup.length.should.equal(1);
+      }).should.notify(done);
+    });
   });
 });
