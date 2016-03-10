@@ -1,6 +1,6 @@
 {
   "name": "fcmp",
-  "version": "0.2.0",
+  "version": "1.0.1",
   "description": "very easy way to compare the content of globs or read streams",
   "scripts": {
     "test": "npm run compile && mocha --compilers js:babel-register --reporter spec",
@@ -8,7 +8,7 @@
     "compile": "babel src --out-dir dist --source-maps",
     "build": "npm run lint && npm test && npm run compile"
   },
-  "main": "fcmp.js",
+  "main": "dist/fcmp.js",
   "repository": {
     "type": "git",
     "url": "git@github.com:raylin/fcmp.git"

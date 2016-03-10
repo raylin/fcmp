@@ -30,6 +30,7 @@ class Deferred {
 /**
  * Validate stream is right type and readable
  *
+ * @private
  * @param {*} obj - any type of obj
  *
  * @return {Boolean} - is valid stream
@@ -43,6 +44,7 @@ function _isReadable(obj) {
 /**
  * Convert src to readable stream
  *
+ * @private
  * @param {*} src - glob or readable stream or something
  *
  * @return {Stream} - readable stream
@@ -71,6 +73,7 @@ function _src2Stream(src) {
 /**
  * Calculate checksum from stream
  *
+ * @private
  * @param {Stream} rs - readable stream
  *
  * @return {string} - hash value
@@ -126,7 +129,15 @@ function fcmp(...args) {
     return def.promise;
   });
 
-  let _isSame = function _isSame() {
+  /**
+   * Calculate checksum from stream
+   *
+   * @private
+   * @param {Stream} rs - readable stream
+   *
+   * @return {string} - hash value
+   */
+  let _areEqual = function _areEqual() {
     return fcmpP.then(chksObjs => {
       let hashSet = new Set();
 
@@ -148,7 +159,7 @@ function fcmp(...args) {
     });
   };
 
-  let _getDuplicate = function _getDuplicate() {
+  let _getDuplicates = function _getDuplicates() {
     return fcmpP.then(chksObjs => {
       let dupTable = chksObjs.reduce((pv, cv) => {
         if (!pv[cv.hash]) {
@@ -171,9 +182,9 @@ function fcmp(...args) {
   };
 
   return {
-    isSame: _isSame,
+    areEqual: _areEqual,
     getChecksum: _getChecksum,
-    getDuplicate: _getDuplicate
+    getDuplicates: _getDuplicates
   };
 }
 

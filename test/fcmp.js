@@ -60,11 +60,11 @@ describe('fcmp', () => {
     });
   });
 
-  describe('#isSame', () => {
+  describe('#areEqual', () => {
     it('should fail with wrong type arguments', done => {
       let wrontArg = 1234;
 
-      fcmp(wrontArg).isSame().should.be.rejected.and.notify(done);
+      fcmp(wrontArg).areEqual().should.be.rejected.and.notify(done);
     });
 
     it('should fail when no file resolved', done => {
@@ -72,7 +72,7 @@ describe('fcmp', () => {
 
       fcmp(
         nonExistentFile
-      ).isSame().should.be.rejected.and.notify(done);
+      ).areEqual().should.be.rejected.and.notify(done);
     });
 
     it('should pass if part of source could not resolved', done => {
@@ -82,11 +82,11 @@ describe('fcmp', () => {
         nonExistentFile,
         MOCK_FILES.get('1').file,
         MOCK_FILES.get('4').file
-      ).isSame().should.be.fulfilled.and.notify(done);
+      ).areEqual().should.be.fulfilled.and.notify(done);
     });
 
     it('should be the same - glob', done => {
-      fcmp('./test/mock_files/1*').isSame()
+      fcmp('./test/mock_files/1*').areEqual()
       .should.eventually.equal(true).and.notify(done);
     });
 
@@ -95,7 +95,7 @@ describe('fcmp', () => {
         MOCK_FILES.get('1').file,
         MOCK_FILES.get('2').file,
         MOCK_FILES.get('3').file
-      ).isSame().should.eventually.equal(true).and.notify(done);
+      ).areEqual().should.eventually.equal(true).and.notify(done);
     });
 
     it('should be the same - glob + stream', done => {
@@ -104,11 +104,11 @@ describe('fcmp', () => {
         MOCK_FILES.get('3').file,
         createReadStream(MOCK_FILES.get('1').file),
         createReadStream(MOCK_FILES.get('2').file)
-      ).isSame().should.eventually.equal(true).and.notify(done);
+      ).areEqual().should.eventually.equal(true).and.notify(done);
     });
 
     it('should not be the same - glob', done => {
-      fcmp('./test/mock_files/*').isSame()
+      fcmp('./test/mock_files/*').areEqual()
       .should.eventually.equal(false).and.notify(done);
     });
 
@@ -117,7 +117,7 @@ describe('fcmp', () => {
         MOCK_FILES.get('1').file,
         MOCK_FILES.get('2').file,
         MOCK_FILES.get('5').file
-      ).isSame().should.eventually.equal(false).and.notify(done);
+      ).areEqual().should.eventually.equal(false).and.notify(done);
     });
 
     it('should not be the same - glob + stream', done => {
@@ -126,7 +126,7 @@ describe('fcmp', () => {
         MOCK_FILES.get('6').file,
         createReadStream(MOCK_FILES.get('1').file),
         createReadStream(MOCK_FILES.get('3').file)
-      ).isSame().should.eventually.equal(false).and.notify(done);
+      ).areEqual().should.eventually.equal(false).and.notify(done);
     });
   });
 
@@ -163,7 +163,7 @@ describe('fcmp', () => {
         MOCK_FILES.get('1').file,
         MOCK_FILES.get('4').file,
         createReadStream(MOCK_FILES.get('5').file)
-      ).getDuplicate().should.be.fulfilled.then(dup => {
+      ).getDuplicates().should.be.fulfilled.then(dup => {
         Object.keys(dup).length.should.be.empty;
       }).should.notify(done);
     });
@@ -173,9 +173,10 @@ describe('fcmp', () => {
         MOCK_FILES.get('1').file,
         MOCK_FILES.get('2').file,
         MOCK_FILES.get('5').file,
-        createReadStream(MOCK_FILES.get('2').file)
-      ).getDuplicate().should.be.fulfilled.then(dup => {
-        dup.length.should.equal(1);
+        createReadStream(MOCK_FILES.get('2').file),
+        createReadStream(MOCK_FILES.get('6').file)
+      ).getDuplicates().should.be.fulfilled.then(dup => {
+        dup.length.should.equal(2);
       }).should.notify(done);
     });
   });

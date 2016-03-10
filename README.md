@@ -4,6 +4,9 @@
 
 ## History
 
+### 1.0.1 / 2016/03/10
+* some API naming
+
 ### 1.0.0 / 2016/03/03
 * change to new API
 * can handle variable argument
@@ -43,27 +46,29 @@ npm install fcmp
 ## Usage
 
 #### require fcmp:
-```
+```javascript
 var fcmp = require('fcmp');
 ```
 
-#### isSame:
-```
-fcmp('/test/file/**/*.png', '/test/file2/a.png', pngReadStream)
-.then(function(isSame) {...})
+#### areEqual:
+```javascript
+fcmp('/test/file/**/*.png', '/test/file2/a.png', pngReadStream).areEqual()
+.then(function(equal) {...})
 // result is Boolean shows whether these files have the same content.
 ```
 
-#### getChecksum:
-```
-fcmp('/test/file/**/*.png', './test/file/*.jpg').then(function(checksums) {...})
+#### getChecksums:
+```javascript
+fcmp('/test/file/**/*.png', './test/file/*.jpg').getChecksums()
+.then(function(checksums) {...})
 // result gives a object with filename and hash pairs.
 ```
 
-#### getDuplicate:
-```
-fcmp('/test/file/**/*.png').then(function(duplicateFiles) {...})
-// result is nested arrays, which put same content files into an array.
+#### getDuplicates:
+```javascript
+fcmp('/test/file/**/*.png').getDuplicates()
+.then(function(duplicateFiles) {...})
+// result is nested arrays, 
 ```
 
 ## Test
