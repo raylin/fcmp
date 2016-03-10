@@ -1,6 +1,6 @@
 {
   "name": "fcmp",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "very easy way to compare the content of globs or read streams",
   "scripts": {
     "lint": "eslint src test",
