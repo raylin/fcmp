@@ -1,6 +1,10 @@
 # fcmp
-[![Build Status](https://travis-ci.org/raylin/fcmp.png)](https://travis-ci.org/raylin/fcmp) [![Dependency Status](https://david-dm.org/raylin/fcmp/dev-status.svg)](https://david-dm.org/raylin/fcmp)
-
+[![Build Status](https://travis-ci.org/raylin/fcmp.png)](https://travis-ci.org/raylin/fcmp) 
+[![Dependency Status](https://david-dm.org/raylin/fcmp/dev-status.svg)](https://david-dm.org/raylin/fcmp)
+[![Coverage Status](https://coveralls.io/repos/github/raylin/fcmp/badge.svg?branch=master)](https://coveralls.io/github/raylin/fcmp?branch=master)
+[![npm version](https://img.shields.io/npm/v/fcmp.svg)](https://www.npmjs.com/package/fcmp)
+[![npm downloads](https://img.shields.io/npm/dm/fcmp.svg)](https://www.npmjs.com/package/fcmp)
+[![npm license](https://img.shields.io/npm/l/fcmp.svg)](http://magicdawn.mit-license.org)
 
 ## History
 
