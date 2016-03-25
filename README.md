@@ -1,12 +1,14 @@
 # fcmp
 [![Build Status](https://travis-ci.org/raylin/fcmp.png)](https://travis-ci.org/raylin/fcmp) 
 [![Dependency Status](https://david-dm.org/raylin/fcmp/dev-status.svg)](https://david-dm.org/raylin/fcmp)
-[![Coverage Status](https://coveralls.io/repos/github/raylin/fcmp/badge.svg?branch=master)](https://coveralls.io/github/raylin/fcmp?branch=master)
 [![npm version](https://img.shields.io/npm/v/fcmp.svg)](https://www.npmjs.com/package/fcmp)
 [![npm downloads](https://img.shields.io/npm/dm/fcmp.svg)](https://www.npmjs.com/package/fcmp)
 [![npm license](https://img.shields.io/npm/l/fcmp.svg)](http://magicdawn.mit-license.org)
 
 ## History
+
+### 1.1.0 / 2016/03/25
+* simplify this module to serve only comparsion function
 
 ### 1.0.1 / 2016/03/10
 * some API naming
@@ -56,23 +58,9 @@ var fcmp = require('fcmp');
 
 #### areEqual:
 ```javascript
-fcmp('/test/file/**/*.png', '/test/file2/a.png', pngReadStream).areEqual()
+fcmp('/test/file/**/*.png', '/test/file2/a.png', pngReadStream)
 .then(function(equal) {...})
 // result is Boolean shows whether these files have the same content.
-```
-
-#### getChecksums:
-```javascript
-fcmp('/test/file/**/*.png', './test/file/*.jpg').getChecksums()
-.then(function(checksums) {...})
-// result gives a object with filename and hash pairs.
-```
-
-#### getDuplicates:
-```javascript
-fcmp('/test/file/**/*.png').getDuplicates()
-.then(function(duplicateFiles) {...})
-// result is nested arrays, 
 ```
 
 ## Test

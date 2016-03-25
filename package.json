@@ -1,12 +1,12 @@
 {
   "name": "fcmp",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "description": "very easy way to compare the content of globs or read streams",
   "scripts": {
     "lint": "eslint src test",
     "compile": "babel src --out-dir dist --source-maps",
     "build": "npm run lint && npm run compile",
-    "test": "npm run build && mocha --compilers js:babel-register --reporter spec",
+    "test": "npm run build && mocha",
     "prepublish": "npm test"
   },
   "main": "dist/fcmp.js",
@@ -33,9 +33,8 @@
     "babel-register": "^6.5.2",
     "chai": "^3.5.0",
     "chai-as-promised": "^5.2.0",
-    "eslint": "^2.2.0",
-    "eslint-config-google": "^0.4.0",
-    "eslint-config-xo": "^0.11.0",
+    "eslint": "^2.4.0",
+    "eslint-config-airbnb": "^6.2.0",
     "mocha": "^2.3.4"
   },
   "dependencies": {

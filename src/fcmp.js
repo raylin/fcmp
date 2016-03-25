@@ -4,20 +4,6 @@ import crypto from 'crypto';
 import fs from 'fs';
 import glob from 'glob';
 
-const HASH_ALGOS = crypto.getHashes();
-
-let options = {
-  _algorithm: 'sha1',
-  get algorithm() {
-    return this._algorithm || 'sha1';
-  },
-  set algorithm(algo) {
-    if (HASH_ALGOS.indexOf(algo) !== -1) {
-      this._algorithm = algo;
-    }
-  }
-};
-
 class Deferred {
   constructor() {
     this.promise = new Promise((resolve, reject) => {
@@ -50,16 +36,15 @@ function _isReadable(obj) {
  * @return {Stream} - readable stream
  */
 function _src2Stream(src) {
-  let def = new Deferred();
+  const def = new Deferred();
 
   if (typeof src === 'string') {
-    glob(src, {nodir: true}, (err, files) => {
+    glob(src, { nodir: true }, (err, files) => {
       if (err) {
-        def.reject(err);
+        return def.reject(err);
       }
-      def.resolve(files.map(f => {
-        return fs.createReadStream(f);
-      }));
+
+      return def.resolve(files.map(f => fs.createReadStream(f)));
     });
   } else if (_isReadable(src)) {
     def.resolve([src]);
@@ -78,21 +63,17 @@ function _src2Stream(src) {
  *
  * @return {string} - hash value
  */
-function _stream2Checksum(rs) {
-  let def = new Deferred();
-  let hasher = crypto.createHash(options.algorithm);
+function _stream2Checksum(rs, algo) {
+  const def = new Deferred();
+  const hasher = crypto.createHash(algo);
 
   rs.on('readable', () => {
-    let data = rs.read();
+    const data = rs.read();
 
     if (data) {
       hasher.update(data);
     } else {
-      def.resolve({
-        name: rs.path ||
-          `file-${crypto.randomBytes(Math.ceil(4)).toString('hex')}`,
-        hash: hasher.digest('hex')
-      });
+      def.resolve(hasher.digest('hex'));
     }
   }).on('error', def.reject);
 
@@ -100,25 +81,21 @@ function _stream2Checksum(rs) {
 }
 
 /**
- * Get checksum from globs or read streams
+ * Return whether files are the same
  *
  * @param {...obj} args - globs or streams
- * @return {string[]} - hashes of sources
+ * @return {Boolean} - are the same or not
  */
 function fcmp(...args) {
-  let fcmpP = Promise.all(args.map(_src2Stream))
-  .then(rsArys => {
-    return Promise.all(
+  return Promise.all(args.map(_src2Stream))
+  .then(rsArys => Promise.all(
       rsArys
-      .reduce((pv, cv) => {
-        return pv.concat(cv);
-      }).map(rs => {
-        return _stream2Checksum(rs);
-      })
-    );
-  })
+      .reduce((pv, cv) => pv.concat(cv))
+      .map(rs => _stream2Checksum(rs, 'sha1'))
+    )
+  )
   .then(chksObjs => {
-    let def = new Deferred();
+    const def = new Deferred();
 
     if (chksObjs.length) {
       def.resolve(chksObjs);
@@ -127,67 +104,14 @@ function fcmp(...args) {
     }
 
     return def.promise;
+  })
+  .then(chksObjs => {
+    const hashSet = new Set();
+
+    chksObjs.forEach(Set.prototype.add.bind(hashSet));
+
+    return hashSet.size === 1;
   });
-
-  /**
-   * Calculate checksum from stream
-   *
-   * @private
-   * @param {Stream} rs - readable stream
-   *
-   * @return {string} - hash value
-   */
-  let _areEqual = function _areEqual() {
-    return fcmpP.then(chksObjs => {
-      let hashSet = new Set();
-
-      chksObjs.map(co => {
-        return co.hash;
-      }).forEach(Set.prototype.add.bind(hashSet));
-
-      return hashSet.size === 1;
-    });
-  };
-
-  let _getChecksum = function _getChecksum() {
-    return fcmpP.then(chksObjs => {
-      return chksObjs.reduce((pv, cv) => {
-        pv[cv.name] = cv.hash;
-
-        return pv;
-      }, {});
-    });
-  };
-
-  let _getDuplicates = function _getDuplicates() {
-    return fcmpP.then(chksObjs => {
-      let dupTable = chksObjs.reduce((pv, cv) => {
-        if (!pv[cv.hash]) {
-          pv[cv.hash] = new Set();
-        }
-        pv[cv.hash].add(cv.name);
-
-        return pv;
-      }, {});
-
-      let result = [];
-      for (let hash in dupTable) {
-        if (dupTable[hash].size > 1) {
-          result.push(Array.from(dupTable[hash]));
-        }
-      }
-
-      return result;
-    });
-  };
-
-  return {
-    areEqual: _areEqual,
-    getChecksum: _getChecksum,
-    getDuplicates: _getDuplicates
-  };
 }
-
-fcmp.options = options;
 
 export default fcmp;
