@@ -1,4 +1,7 @@
 language: node_js
+node_js:
+  - "5.9.1"
+  - "4.4.1"
 install:
   - npm install -g babel-cli
   - npm install
